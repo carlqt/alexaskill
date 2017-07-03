@@ -6,8 +6,9 @@ import (
 )
 
 type AlexaResponse struct {
-	Version  string   `json:"version"`
-	Response Response `json:"response"`
+	Version           string            `json:"version"`
+	SessionAttributes map[string]string `json:"sessionAttributes"`
+	Response          Response          `json:"response"`
 }
 
 type Response struct {
@@ -35,11 +36,19 @@ func AlexaText(speech string) *AlexaResponse {
 		Text: speech,
 		SSML: "",
 	}
+	session := make(map[string]string)
 
 	return &AlexaResponse{
-		Version:  "1.0",
-		Response: Response{OutputSpeech: outputSpeech, ShouldEndSession: true},
+		Version:           "1.0",
+		Response:          Response{OutputSpeech: outputSpeech, ShouldEndSession: false},
+		SessionAttributes: session,
 	}
+}
+
+func (a *AlexaResponse) SessionAttr(key, value string) *AlexaResponse {
+	a.SessionAttributes[key] = value
+
+	return a
 }
 
 func (a *AlexaResponse) SimpleCard(title, content string) *AlexaResponse {
@@ -52,7 +61,8 @@ func (a *AlexaResponse) SimpleCard(title, content string) *AlexaResponse {
 	return a
 }
 
-func (a *AlexaResponse) Respond(w http.ResponseWriter, status int) {
+func (a *AlexaResponse) Respond(w http.ResponseWriter, status int, closeSession bool) {
+	a.Response.ShouldEndSession = closeSession
 	resp, _ := json.Marshal(a)
 
 	w.WriteHeader(status)
