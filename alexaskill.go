@@ -32,6 +32,8 @@ import (
 	"io/ioutil"
 )
 
+type sessionAttr map[string]string
+
 // AlexaRequest is the struct of the incoming alexa request
 type AlexaRequest struct {
 	Request struct {
@@ -50,11 +52,21 @@ type Session struct {
 	Application struct {
 		ApplicationID string `json:"applicationId"`
 	} `json:"application"`
+
+	Attributes sessionAttr `json:"attributes"`
 }
 
 // Intent object of alexa request
 type Intent struct {
-	Name string `json:"name"`
+	Name  string `json:"name"`
+	Slots slots
+}
+
+type Slots struct {
+	Answer struct {
+		Name  string `json:"name"`
+		Value string `json:"value"`
+	} `json:"answer"`
 }
 
 // AlexaNewRequest is a constructor that reads the request.Body from Amazon
@@ -86,4 +98,12 @@ func (a *AlexaRequest) IntentName() string {
 //AppID is a function shortcut to get AlexaRequest.Request.Intent.Name
 func (a *AlexaRequest) AppID() string {
 	return a.Session.Application.ApplicationID
+}
+
+func (a *AlexaRequest) GetSessionAttr(key string) string {
+	return a.Session.Attributes[key]
+}
+
+func (s *Session) Get(key string) string {
+	return s.Attributes[key]
 }

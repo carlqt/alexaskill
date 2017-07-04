@@ -5,10 +5,12 @@ import (
 	"net/http"
 )
 
+type sessionAttr map[string]string
+
 type AlexaResponse struct {
-	Version           string            `json:"version"`
-	SessionAttributes map[string]string `json:"sessionAttributes"`
-	Response          Response          `json:"response"`
+	Version           string      `json:"version"`
+	SessionAttributes sessionAttr `json:"sessionAttributes"`
+	Response          Response    `json:"response"`
 }
 
 type Response struct {
