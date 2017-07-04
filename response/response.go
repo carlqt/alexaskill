@@ -17,6 +17,9 @@ type Response struct {
 	OutputSpeech     OutputSpeech `json:"outputSpeech"`
 	Card             Card         `json:"card,omitempty"`
 	ShouldEndSession bool         `json:"shouldEndSession"`
+	Reprompt         struct {
+		OutputSpeech OutputSpeech `json:"outputSpeech"`
+	} `json:"reprompt"`
 }
 
 type OutputSpeech struct {
@@ -69,4 +72,15 @@ func (a *AlexaResponse) Respond(w http.ResponseWriter, status int, closeSession 
 
 	w.WriteHeader(status)
 	w.Write(resp)
+}
+
+func (a *AlexaResponse) RepromptText(speech string) *AlexaResponse {
+	outputSpeech := OutputSpeech{
+		Type: "PlainText",
+		Text: speech,
+		SSML: "",
+	}
+
+	a.Response.Reprompt.OutputSpeech = outputSpeech
+	return a
 }
