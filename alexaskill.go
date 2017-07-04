@@ -59,7 +59,7 @@ type Session struct {
 // Intent object of alexa request
 type Intent struct {
 	Name  string `json:"name"`
-	Slots slots
+	Slots Slots  `json:"slots"`
 }
 
 type Slots struct {
@@ -98,6 +98,10 @@ func (a *AlexaRequest) IntentName() string {
 //AppID is a function shortcut to get AlexaRequest.Request.Intent.Name
 func (a *AlexaRequest) AppID() string {
 	return a.Session.Application.ApplicationID
+}
+
+func (a *AlexaRequest) GetUserAnswer() string {
+	return a.Request.Intent.Slots.Answer.Value
 }
 
 func (a *AlexaRequest) GetSessionAttr(key string) string {
